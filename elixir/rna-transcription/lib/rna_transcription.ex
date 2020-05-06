@@ -17,6 +17,6 @@ defmodule RnaTranscription do
   end
   @spec to_rna([char]) :: [char]
   def to_rna(dna) do
-    List.to_charlist(Enum.map(dna, fn each -> convert_rna_char(each) end))
+    List.foldl(dna, '', fn each, acc -> acc ++ convert_rna_char(each) end)
   end
 end
