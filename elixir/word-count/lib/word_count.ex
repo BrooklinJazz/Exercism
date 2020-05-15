@@ -7,20 +7,21 @@ defmodule WordCount do
   @spec count(String.t()) :: map
   def count(sentence) do
     sentence
+    |> String.downcase
     |> filter_punctuation
-    |> split_sentence
+    |> String.split
     |> count_words
   end
 
   def filter_punctuation(sentence) do
-    Regex.replace( ~r/[[:punct:]]/, sentence, " ")
-  end
-
-  def split_sentence(sentence) do
-    String.split(sentence)
+    Regex.replace( ~r/@|#|\$|%|&|\^|:|_|!|,/u, sentence, " ")
   end
 
   def count_words(word_list) do
-    Enum.reduce(word_list, %{}, fn each, total -> Map.update(total, each, 1, &(&1 + 1)) end)
+    Enum.reduce(word_list, %{}, &combine/2)
+  end
+
+  def combine(word, map) do
+    Map.update(map, word, 1, &(&1 + 1))
   end
 end
