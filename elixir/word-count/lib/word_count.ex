@@ -13,7 +13,7 @@ defmodule WordCount do
   end
 
   def filter_punctuation(sentence) do
-    Regex.replace( ~r/^[[:punct:]]+$/, sentence, " ")
+    Regex.replace( ~r/[[:punct:]]/, sentence, " ")
   end
 
   def split_sentence(sentence) do
