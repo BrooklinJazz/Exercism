@@ -1,5 +1,6 @@
 defmodule RobotSimulator do
   import RobotValidator
+
   @doc """
   Create a Robot Simulator given an initial direction and position.
 
@@ -8,6 +9,7 @@ defmodule RobotSimulator do
   @spec create(direction :: atom, position :: {integer, integer}) :: any
   def create(direction \\ :north, position \\ {0, 0}) do
     robot = %RobotSimulator.Robot{direction: direction, position: position}
+
     case validate_robot(robot) do
       {:ok, robot} -> robot
       {:error, reason} -> {:error, reason}
@@ -30,24 +32,26 @@ defmodule RobotSimulator do
     instruction = String.first(instructions)
     nextInstructions = String.slice(instructions, 1..-1)
 
-    case valid_instructions?(instructions) do
-      true ->
-        instruct(robot, instruction) |> simulate(nextInstructions)
-
-      _ ->
-        {:error, "invalid instruction"}
+    case instruct(robot, instruction) do
+      {:ok, robot} -> simulate(robot, nextInstructions)
+      {:error, reason} -> {:error, reason}
     end
   end
 
   @doc """
   return a new robot after performing one instruction
   """
+  def instruct(_robot, instruction) when instruction not in ["A", "R", "L"] do
+    {:error, "invalid instruction"}
+  end
+
   def instruct(robot, instruction) do
-    case String.first(instruction) do
+    robot = case String.first(instruction) do
       "R" -> turn_right(robot)
       "L" -> turn_left(robot)
       "A" -> advance(robot)
     end
+    {:ok, robot}
   end
 
   @doc """
