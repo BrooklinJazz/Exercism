@@ -18,43 +18,36 @@ defmodule RobotSimulator do
   end
 
   def valid_position?(position) do
-
-    # // TODO REFACTOR
     cond do
       not is_tuple(position) -> false
       tuple_size(position) != 2 -> false
-      not is_number elem(position, 0) -> false
-      not is_number elem(position, 1) -> false
+      not is_number(elem(position, 0)) -> false
+      not is_number(elem(position, 1)) -> false
       true -> true
     end
   end
 
-  @doc """
-  Simulate the robot's movement given a string of instructions.
-
-  Valid instructions are: "R" (turn right), "L", (turn left), and "A" (advance)
-  """
-
   @spec simulate(robot :: any, instructions :: String.t()) :: any
   def simulate(robot, instructions) do
     instruction = String.first(instructions)
+
     cond do
       String.length(instructions) == 0 ->
         robot
-        not valid_instruction?(instruction) -> {:error, "invalid instruction"}
+
+      not valid_instruction?(instruction) ->
+        {:error, "invalid instruction"}
+
       true ->
         instruct(robot, instruction) |> simulate(String.slice(instructions, 1..-1))
     end
   end
 
-  def instruct(
-        %RobotSimulator.Robot{direction: direction, position: position} = robot,
-        instruction
-      ) do
+  def instruct(robot, instruction) do
     case String.first(instruction) do
-      "R" -> %RobotSimulator.Robot{robot | direction: turn_right(direction)}
-      "L" -> %RobotSimulator.Robot{robot | direction: turn_left(direction)}
-      "A" -> %RobotSimulator.Robot{robot | position: advance(position, direction)}
+      "R" -> turn_right(robot)
+      "L" -> turn_left(robot)
+      "A" -> advance(robot)
       _ -> {:error, "invalid instruction"}
     end
   end
@@ -63,32 +56,40 @@ defmodule RobotSimulator do
     Enum.member?(["A", "R", "L"], instruction)
   end
 
-  # TODO refactor turn_right, turn_left, and advance to also take a robot.
-  def turn_right(direction) do
-    case direction do
-      :north -> :east
-      :east -> :south
-      :south -> :west
-      :west -> :north
-    end
+  defp turn_right(%RobotSimulator.Robot{direction: oldDirection} = robot) do
+    newDirection =
+      case oldDirection do
+        :north -> :east
+        :east -> :south
+        :south -> :west
+        :west -> :north
+      end
+
+    %RobotSimulator.Robot{robot | direction: newDirection}
   end
 
-  def turn_left(direction) do
-    case direction do
-      :north -> :west
-      :west -> :south
-      :south -> :east
-      :east -> :north
-    end
+  defp turn_left(%RobotSimulator.Robot{direction: oldDirection} = robot) do
+    newDirection =
+      case oldDirection do
+        :north -> :west
+        :west -> :south
+        :south -> :east
+        :east -> :north
+      end
+
+    %RobotSimulator.Robot{robot | direction: newDirection}
   end
 
-  def advance({x, y}, direction) do
-    case direction do
-      :north -> {x, y + 1}
-      :east -> {x + 1, y}
-      :south -> {x, y - 1}
-      :west -> {x - 1, y}
-    end
+  def advance(%RobotSimulator.Robot{position: {x, y}, direction: direction} = robot) do
+    pos =
+      case direction do
+        :north -> {x, y + 1}
+        :east -> {x + 1, y}
+        :south -> {x, y - 1}
+        :west -> {x - 1, y}
+      end
+
+    %RobotSimulator.Robot{robot | position: pos}
   end
 
   @doc """
