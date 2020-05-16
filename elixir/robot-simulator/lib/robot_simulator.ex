@@ -14,7 +14,12 @@ defmodule RobotSimulator do
     end
   end
 
+  @doc """
+  simulate robot instructions as a string of valid characters
+  return robot with changed direction and positions given the instructions.
 
+  Valid characters are "A", "L", and "R"
+  """
 
   @spec simulate(robot :: any, instructions :: String.t()) :: any
   def simulate(robot, instructions) when instructions == "" do
