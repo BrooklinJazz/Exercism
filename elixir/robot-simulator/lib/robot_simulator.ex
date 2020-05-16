@@ -38,11 +38,10 @@ defmodule RobotSimulator do
     instruction = String.first(instructions)
     nextInstructions = String.slice(instructions, 1..-1)
 
-    cond do
-      valid_instructions?(instructions) ->
-        instruct(robot, instruction) |> simulate(nextInstructions)
-
+    case valid_instructions?(instructions) do
       true ->
+        instruct(robot, instruction) |> simulate(nextInstructions)
+      _ ->
         {:error, "invalid instruction"}
     end
   end
