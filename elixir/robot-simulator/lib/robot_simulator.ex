@@ -37,12 +37,13 @@ defmodule RobotSimulator do
 
   @spec simulate(robot :: any, instructions :: String.t()) :: any
   def simulate(robot, instructions) do
+    instruction = String.first(instructions)
     cond do
       String.length(instructions) == 0 ->
         robot
-
+        not valid_instruction?(instruction) -> {:error, "invalid instruction"}
       true ->
-        instruct(robot, String.first(instructions)) |> simulate(String.slice(instructions, 1..-1))
+        instruct(robot, instruction) |> simulate(String.slice(instructions, 1..-1))
     end
   end
 
@@ -54,7 +55,12 @@ defmodule RobotSimulator do
       "R" -> %RobotSimulator.Robot{robot | direction: turn_right(direction)}
       "L" -> %RobotSimulator.Robot{robot | direction: turn_left(direction)}
       "A" -> %RobotSimulator.Robot{robot | position: advance(position, direction)}
+      _ -> {:error, "invalid instruction"}
     end
+  end
+
+  def valid_instruction?(instruction) do
+    Enum.member?(["A", "R", "L"], instruction)
   end
 
   # TODO refactor turn_right, turn_left, and advance to also take a robot.
