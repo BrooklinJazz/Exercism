@@ -13,6 +13,48 @@ defmodule RobotSimulator do
     end
   end
 
+  @spec simulate(robot :: any, instructions :: String.t()) :: any
+
+  def simulate(robot, instructions) when instructions == "" do
+    robot
+  end
+
+  # def simulate(robot, instructions) do
+  #   instruction = String.first(instructions)
+
+  #   cond do
+  #     String.length(instructions) == 0 ->
+  #       robot
+
+  #     not valid_instruction?(instruction) ->
+  #       {:error, "invalid instruction"}
+
+  #     true ->
+  #       instruct(robot, instruction) |> simulate(String.slice(instructions, 1..-1))
+  #   end
+  # end
+
+  def simulate(robot, instructions) do
+    instruction = String.first(instructions)
+    nextInstructions = String.slice(instructions, 1..-1)
+
+    cond do
+      valid_instructions?(instructions) ->
+        instruct(robot, instruction) |> simulate(nextInstructions)
+
+      true ->
+        {:error, "invalid instruction"}
+    end
+  end
+
+  def valid_instructions?(instructions) do
+    String.graphemes(instructions) |> Enum.all?(fn each -> Enum.member?(["A", "R", "L"], each) end)
+  end
+
+  def valid_instruction?(instruction) do
+    Enum.member?(["A", "R", "L"], instruction)
+  end
+
   def valid_direction?(direction) do
     Enum.member?([:north, :south, :west, :east], direction)
   end
@@ -27,22 +69,6 @@ defmodule RobotSimulator do
     end
   end
 
-  @spec simulate(robot :: any, instructions :: String.t()) :: any
-  def simulate(robot, instructions) do
-    instruction = String.first(instructions)
-
-    cond do
-      String.length(instructions) == 0 ->
-        robot
-
-      not valid_instruction?(instruction) ->
-        {:error, "invalid instruction"}
-
-      true ->
-        instruct(robot, instruction) |> simulate(String.slice(instructions, 1..-1))
-    end
-  end
-
   def instruct(robot, instruction) do
     case String.first(instruction) do
       "R" -> turn_right(robot)
@@ -50,10 +76,6 @@ defmodule RobotSimulator do
       "A" -> advance(robot)
       _ -> {:error, "invalid instruction"}
     end
-  end
-
-  def valid_instruction?(instruction) do
-    Enum.member?(["A", "R", "L"], instruction)
   end
 
   defp turn_right(%RobotSimulator.Robot{direction: oldDirection} = robot) do
