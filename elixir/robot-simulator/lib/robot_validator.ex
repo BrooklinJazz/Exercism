@@ -1,6 +1,15 @@
 defmodule RobotValidator do
+  def validate_robot(%RobotSimulator.Robot{direction: direction, position: position} = robot) do
+    cond do
+      not valid_direction?(direction) -> {:error, "invalid direction"}
+      not valid_position?(position) -> {:error, "invalid position"}
+      true -> {:ok, robot}
+    end
+  end
+
   def valid_instructions?(instructions) do
-    String.graphemes(instructions) |> Enum.all?(fn each -> Enum.member?(["A", "R", "L"], each) end)
+    String.graphemes(instructions)
+    |> Enum.all?(fn each -> Enum.member?(["A", "R", "L"], each) end)
   end
 
   def valid_instruction?(instruction) do
@@ -20,5 +29,4 @@ defmodule RobotValidator do
       true -> true
     end
   end
-
 end

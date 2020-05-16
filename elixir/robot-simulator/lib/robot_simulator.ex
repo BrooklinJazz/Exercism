@@ -7,12 +7,14 @@ defmodule RobotSimulator do
   """
   @spec create(direction :: atom, position :: {integer, integer}) :: any
   def create(direction \\ :north, position \\ {0, 0}) do
-    cond do
-      not valid_direction?(direction) -> {:error, "invalid direction"}
-      not valid_position?(position) -> {:error, "invalid position"}
-      true -> %RobotSimulator.Robot{direction: direction, position: position}
+    robot = %RobotSimulator.Robot{direction: direction, position: position}
+    case validate_robot(robot) do
+      {:ok, robot} -> robot
+      {:error, reason} -> {:error, reason}
     end
   end
+
+
 
   @spec simulate(robot :: any, instructions :: String.t()) :: any
   def simulate(robot, instructions) when instructions == "" do
